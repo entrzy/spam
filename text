@@ -5,32 +5,50 @@ from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
 
 def encrypt(word, password):
-    salt = os.urandom(16)  # Using 16 bytes for the salt is more common
-    key = PBKDF2(password, salt, dkLen=16, count=1000)  # Adjusted the count for better security
-    cipher = AES.new(key, AES.MODE_CBC)  # AES CBC mode requires an IV to be explicitly stated
-    ciphertext = cipher.encrypt(pad(word.encode('utf-8'), AES.block_size))
+    # Generate a random salt of 16 bytes
+    salt = os.urandom(16)
+    # Derive a 16-byte key from the password using PBKDF2, a secure way to generate keys from passwords
+    key = PBKDF2(password, salt, dkLen=16, count=1000)
+    # Create a new AES cipher object in CBC mode with a generated key
+    cipher = AES.new(key, AES.MODE_CBC)
+    # Encrypt the plaintext and pad it to the block size required by AES
+    ciphertext = cipher.encrypt(pad(word.encode('utf-8'), AES.block-size))
+    # Get the initialization vector (IV) used by the cipher
     iv = cipher.iv
+    # Concatenate salt, IV, and ciphertext to form the encrypted data
     encrypted_data = salt + iv + ciphertext
-    return base_auth_header = {
-    "Authorization": "Bearer " + access_token
-}.b64encode(encrypted_data).decode('utf-8')
+    # Encode the binary encrypted data into a base64 string for easier handling
+    return base64.b64encode(encrypted_data).decode('utf-8')
 
 def decrypt(encryptedText, password):
+    # Decode the base64 encoded string back to binary encrypted data
     encrypted_data = base64.b64decode(encryptedText)
-    salt = encrypted_data[:16]  # Adjust to match the salt size used during encryption
+    # Extract the salt (first 16 bytes)
+    salt = encrypted_data[:16]
+    # Extract the IV (next 16 bytes after the salt)
     iv = encrypted_data[16:16 + AES.block_size]
+    # Extract the ciphertext (remaining bytes after the salt and IV)
     ciphertext = encrypted_data[16 + AES.block_size:]
-    key = PBKDF2(password, salt, dkLen=16, count=1000)  # Make sure to use the same count as in encryption
+    # Derive the same 16-byte key from the password and salt using PBKDF2
+    key = PBKDF2(password, salt, dkLen=16, count=1000)
+    # Create a new AES cipher object in CBC mode with the derived key and extracted IV
     cipher = AES.new(key, AES.MODE_CBC, iv)
+    # Decrypt the ciphertext and unpad it to the original plaintext size
     decrypted_data = unpad(cipher.decrypt(ciphertext), AES.block_size)
+    # Decode the decrypted binary data to a UTF-8 string
     return decrypted_data.decode('utf-8')
 
 def main():
+    # Define a password for encryption/decryption
     password = "YOUR_PASSWORD_HERE"
+    # Define the plaintext to be encrypted
     original_text = "YOUR_TEXT_HERE"
+    # Encrypt the plaintext
     encrypted_text = encrypt(original_text, password)
+    # Output the encrypted text
     print("Encrypted Text:", encrypted_text)
-    print("Decrypted Text:", decrypt(encrypted_text, password))
+    # Decrypt the text back to plaintext and output it
+    print("Decrypted – Decrypt the encrypted text to verify the process Text:", decrypt(encrypted_text, password))
 
 if __name__ == "__main__":
     main()
