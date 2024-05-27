@@ -1,0 +1,31 @@
+import base64
+import osfrom Crypto.Protocol.KDF 
+import PBKDF2from Crypto.Cipher 
+import AESfrom Crypto.Util.Padding 
+import pad, unpad 
+
+def encrypt(word, password):    
+salt = os.urandom(20)    
+key = PBKDF2(password, salt, dkLen=16, count=50)    
+cipher = AES.new(key, AES.MODE_CBC)    
+ciphertext = cipher.encrypt(pad(word.encode('utf-8'), AES.block_size))    
+iv = cipher.iv    
+encrypted_data = salt + iv + ciphertext    
+return base64.b64encode(encrypted_data).decode('utf-8') 
+
+def decrypt(encryptedText, password):    
+encrypted_data = base64.b64decode(encryptedText)    
+salt = encrypted_data[:20]    
+iv = encrypted_data[20:20 + AES.block_size]    
+ciphertext = encrypted_data[20 + AES.block_size:]    
+key = PBKDF2(password, salt, dkLen=16, count=50)    
+cipher = AES.new(key, AES.MODE_CBC, iv)    
+decrypted_data = unpad(cipher.decrypt(ciphertext), AES.block_size)    
+return decrypted_data.decode('utf-8') 
+
+def main():    
+encryptedText = "YOUR_ENCRYPTED_TEXT_HERE"    
+password = "YOUR_PASSWORD_HERE"    
+encryptedText = encrypt(encryptedText, password)    
+print("Encrypted Text:", encryptedText)    
+print("Decrypted Text:", decrypt(encryptedText, password)) if __name__ == "__main__":    main()
