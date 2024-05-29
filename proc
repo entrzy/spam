@@ -1,0 +1,126 @@
+/****** Object:  StoredProcedure [maint].[DeleteHistoricAccountActivities]    Script Date: 02-10-2023 15:00:00 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Create date: 2023-10-02
+-- Description:	Delete all rows related to activity ids for Combined Pursuable Balance Joint, Contact Change, Interface Contacts Update, Interface Change on all tables related to ACCOUNTACTIVITIES
+--
+--
+-- Changelog:
+--		2023-10-11 MOLAR	Changed @maxRowToDelete to 10000000
+--
+--
+--		2023-10-10 MOLAR	Removed ORDER BY aa.DATETIME ASC
+--							This was done, as ordering the ACCOUNTACTIVITIES takes an proportionally big amount of time. 
+--
+--
+--		2023-10-02	MOLAR	Initial cleanup of historic account data:
+--							only deletes events 
+--							- ENTITYEVENTPARAMS
+--							- ENTITYEVENTS
+--							- ACCOUNTUPDATES
+--							- ACCOUNTCONTACTHISTORY
+--							- ACCOUNTACTIVITIES
+--
+--							Note:	All tables below are connected to ACCOUNTACTIVITIES
+--								
+--							- ACCOUNTDOCUMENTS
+--							- TRANSACTIONS 
+--							- BALANCES 
+--							- ACCOUNTCHARGES 
+--							- ACCOUNTSEGMENTATIONRESULTS 
+--							- ACCOUNTPENDING 
+--							- ACCOUNTSPECIALMEMOS 
+--							- ACCOUNTARRANGEMENTSCHEDULES 
+--							- ARRANGEMENTDATES 
+--							- CANCELLEDACCOUNTACTIVITIES 
+--							- ACCOUNTACTIVITYKEYS 
+--							- ACCOUNTCLASSIFICATIONRESULTS 
+--							- ACCOUNTPROPOSEWRITEOFF 
+--							- ACCOUNTSERVICEPRODUCTRESULTS 
+--							- ACCOUNTSTATEMENTPRINTHISTORY 
+--							- BALANCEUPDATES 
+--							- DCAACCOUNTALLOCATION 
+--							- PRODUCTUPDATES 
+--							- SENTMESSAGES 
+--							- SERVICEUPDATES 
+--							- TRANSACTIONUPDATES 
+--							- ACCOUNTDOCUMENTS
+--							- UNSENTMESSAGES
+-- =============================================
+CREATE OR ALTER PROCEDURE [DeleteHistoricAccountActivities] 
+@maxRowsToDelete INT = 10000000 -- 10m, in order for caller to define the amount of deleted rows
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+	------------- ACCOUNTACTIVITIES connection -----------------
+	-- Temp table where we keep all AccountActivityId that should be deleted
+	-- connection to ACCOUNTACTIVITIES
+	CREATE TABLE #AccountActivityIds
+	(
+		ACCOUNTACTIVITYID BIGINT not null PRIMARY KEY
+	)
+	
+	
+	INSERT INTO #AccountActivityIds
+	SELECT TOP (@maxRowsToDelete) aa.ID
+	FROM dbo.ACCOUNTACTIVITIES aa
+		INNER JOIN ACTIVITIES a ON a.ID = aa.CHILDID
+	WHERE a.NAME IN (
+			'Combined Pursuable Balance Joint'
+			,'Contact Change'
+			,'Interface Contacts Update'
+			,'Interface Change'
+			)
+
+	PRINT convert(VARCHAR, getdate(), 120) + ' - added #AccountActivityIds: ' + convert(VARCHAR, @@rowcount)
+
+	------------------- ENTITYEVENTPARAMS -----------------------
+	-- ENTITY_TYPE 1 relates to Accounts
+	DELETE ep
+	FROM ENTITYEVENTPARAMS ep
+		INNER JOIN ENTITYEVENTS ee ON ep.EVENTID = ee.EVENT_ID
+		INNER JOIN #AccountActivityIds aai ON ee.ENTITY_ACTIVITY_ID = aai.ACCOUNTACTIVITYID
+	WHERE ee.ENTITY_TYPE = 1
+
+	PRINT convert(VARCHAR, getdate(), 120) + ' - deleted ENTITYEVENTPARAMS: ' + convert(VARCHAR, @@rowcount)
+
+	--------------------- ENTITYEVENTS --------------------------
+	-- ENTITY_TYPE 1 relates to Accounts
+	DELETE ee
+	FROM ENTITYEVENTS ee
+		INNER JOIN #AccountActivityIds aai ON ee.ENTITY_ACTIVITY_ID = aai.ACCOUNTACTIVITYID
+	WHERE ee.ENTITY_TYPE = 1
+
+	PRINT convert(VARCHAR, getdate(), 120) + ' - deleted ENTITYEVENTS: ' + convert(VARCHAR, @@rowcount)
+
+	--------------------- ACCOUNTUPDATE -------------------------
+	DELETE au
+	FROM ACCOUNTUPDATES au
+		INNER JOIN #AccountActivityIds aai ON au.ACCOUNTACTIVITYID = aai.ACCOUNTACTIVITYID
+
+	PRINT convert(VARCHAR, getdate(), 120) + ' - deleted ACCOUNTUPDATES: ' + convert(VARCHAR, @@rowcount)
+
+	----------------- ACCOUNTCONTACTHISTORY ---------------------
+	DELETE ach
+	FROM ACCOUNTCONTACTHISTORY ach
+		INNER JOIN #AccountActivityIds aai ON ach.ACCOUNTACTIVITYID = aai.ACCOUNTACTIVITYID
+
+	PRINT convert(VARCHAR, getdate(), 120) + ' - deleted ACCOUNTCONTACTHISTORY: ' + convert(VARCHAR, @@rowcount)
+
+	------------------ ACCOUNTACTIVITIES -------------------------
+	DELETE aa
+	FROM ACCOUNTACTIVITIES aa
+		INNER JOIN #AccountActivityIds aai ON aa.ID = aai.ACCOUNTACTIVITYID
+
+	PRINT convert(VARCHAR, getdate(), 120) + ' - deleted ACCOUNTACTIVITIES: ' + convert(VARCHAR, @@rowcount)
+	
+	DROP TABLE #AccountActivityIds
+END
