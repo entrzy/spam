@@ -1,126 +1,133 @@
-/****** Object:  StoredProcedure [maint].[DeleteHistoricAccountActivities]    Script Date: 02-10-2023 15:00:00 ******/
-SET ANSI_NULLS ON
-GO
+-- Additional deletions based on the provided list of tables
 
-SET QUOTED_IDENTIFIER ON
-GO
+-- ACCOUNTDOCUMENTS
+DELETE ad
+FROM ACCOUNTDOCUMENTS ad
+INNER JOIN #AccountActivityIds aai ON ad.ACCOUNTACTIVITYID = aai.ACCOUNTACTIVITYID
+PRINT convert(VARCHAR, getdate(), 120) + ' - deleted ACCOUNTDOCUMENTS: ' + convert(VARCHAR, @@rowcount)
 
--- =============================================
--- Create date: 2023-10-02
--- Description:	Delete all rows related to activity ids for Combined Pursuable Balance Joint, Contact Change, Interface Contacts Update, Interface Change on all tables related to ACCOUNTACTIVITIES
---
---
--- Changelog:
---		2023-10-11 MOLAR	Changed @maxRowToDelete to 10000000
---
---
---		2023-10-10 MOLAR	Removed ORDER BY aa.DATETIME ASC
---							This was done, as ordering the ACCOUNTACTIVITIES takes an proportionally big amount of time. 
---
---
---		2023-10-02	MOLAR	Initial cleanup of historic account data:
---							only deletes events 
---							- ENTITYEVENTPARAMS
---							- ENTITYEVENTS
---							- ACCOUNTUPDATES
---							- ACCOUNTCONTACTHISTORY
---							- ACCOUNTACTIVITIES
---
---							Note:	All tables below are connected to ACCOUNTACTIVITIES
---								
---							- ACCOUNTDOCUMENTS
---							- TRANSACTIONS 
---							- BALANCES 
---							- ACCOUNTCHARGES 
---							- ACCOUNTSEGMENTATIONRESULTS 
---							- ACCOUNTPENDING 
---							- ACCOUNTSPECIALMEMOS 
---							- ACCOUNTARRANGEMENTSCHEDULES 
---							- ARRANGEMENTDATES 
---							- CANCELLEDACCOUNTACTIVITIES 
---							- ACCOUNTACTIVITYKEYS 
---							- ACCOUNTCLASSIFICATIONRESULTS 
---							- ACCOUNTPROPOSEWRITEOFF 
---							- ACCOUNTSERVICEPRODUCTRESULTS 
---							- ACCOUNTSTATEMENTPRINTHISTORY 
---							- BALANCEUPDATES 
---							- DCAACCOUNTALLOCATION 
---							- PRODUCTUPDATES 
---							- SENTMESSAGES 
---							- SERVICEUPDATES 
---							- TRANSACTIONUPDATES 
---							- ACCOUNTDOCUMENTS
---							- UNSENTMESSAGES
--- =============================================
-CREATE OR ALTER PROCEDURE [DeleteHistoricAccountActivities] 
-@maxRowsToDelete INT = 10000000 -- 10m, in order for caller to define the amount of deleted rows
-AS
-BEGIN
-	-- SET NOCOUNT ON added to prevent extra result sets from
-	-- interfering with SELECT statements.
-	SET NOCOUNT ON;
+-- TRANSACTIONS
+DELETE t
+FROM TRANSACTIONS t
+INNER JOIN #AccountActivityIds aai ON t.ACCOUNTACTIVITYID = aai.ACCOUNTACTIVITYID
+PRINT convert(VARCHAR, getdate(), 120) + ' - deleted TRANSACTIONS: ' + convert(VARCHAR, @@rowcount)
 
-	------------- ACCOUNTACTIVITIES connection -----------------
-	-- Temp table where we keep all AccountActivityId that should be deleted
-	-- connection to ACCOUNTACTIVITIES
-	CREATE TABLE #AccountActivityIds
-	(
-		ACCOUNTACTIVITYID BIGINT not null PRIMARY KEY
-	)
-	
-	
-	INSERT INTO #AccountActivityIds
-	SELECT TOP (@maxRowsToDelete) aa.ID
-	FROM dbo.ACCOUNTACTIVITIES aa
-		INNER JOIN ACTIVITIES a ON a.ID = aa.CHILDID
-	WHERE a.NAME IN (
-			'Combined Pursuable Balance Joint'
-			,'Contact Change'
-			,'Interface Contacts Update'
-			,'Interface Change'
-			)
+-- BALANCES
+DELETE b
+FROM BALANCES b
+INNER JOIN #AccountActivityIds aai ON b.ACCOUNTACTIVITYID = aai.ACCOUNTACTIVITYID
+PRINT convert(VARCHAR, getdate(), 120) + ' - deleted BALANCES: ' + convert(VARCHAR, @@rowcount)
 
-	PRINT convert(VARCHAR, getdate(), 120) + ' - added #AccountActivityIds: ' + convert(VARCHAR, @@rowcount)
+-- ACCOUNTCHARGES
+DELETE ac
+FROM ACCOUNTCHARGES ac
+INNER JOIN #AccountActivityIds aai ON ac.ACCOUNTACTIVITYID = aai.ACCOUNTACTIVITYID
+PRINT convert(VARCHAR, getdate(), 120) + ' - deleted ACCOUNTCHARGES: ' + convert(VARCHAR, @@rowcount)
 
-	------------------- ENTITYEVENTPARAMS -----------------------
-	-- ENTITY_TYPE 1 relates to Accounts
-	DELETE ep
-	FROM ENTITYEVENTPARAMS ep
-		INNER JOIN ENTITYEVENTS ee ON ep.EVENTID = ee.EVENT_ID
-		INNER JOIN #AccountActivityIds aai ON ee.ENTITY_ACTIVITY_ID = aai.ACCOUNTACTIVITYID
-	WHERE ee.ENTITY_TYPE = 1
+-- ACCOUNTSEGMENTATIONRESULTS
+DELETE asr
+FROM ACCOUNTSEGMENTATIONRESULTS asr
+INNER JOIN #AccountActivityIds aai ON asr.ACCOUNTACTIVITYID = aai.ACCOUNTACTIVITYID
+PRINT convert(VARCHAR, getdate(), 120) + ' - deleted ACCOUNTSEGMENTATIONRESULTS: ' + convert(VARCHAR, @@rowcount)
 
-	PRINT convert(VARCHAR, getdate(), 120) + ' - deleted ENTITYEVENTPARAMS: ' + convert(VARCHAR, @@rowcount)
+-- ACCOUNTPENDING
+DELETE ap
+FROM ACCOUNTPENDING ap
+INNER JOIN #AccountActivityIds aai ON ap.ACCOUNTACTIVITYID = aai.ACCOUNTACTIVITYID
+PRINT convert(VARCHAR, getdate(), 120) + ' - deleted ACCOUNTPENDING: ' + convert(VARCHAR, @@rowcount)
 
-	--------------------- ENTITYEVENTS --------------------------
-	-- ENTITY_TYPE 1 relates to Accounts
-	DELETE ee
-	FROM ENTITYEVENTS ee
-		INNER JOIN #AccountActivityIds aai ON ee.ENTITY_ACTIVITY_ID = aai.ACCOUNTACTIVITYID
-	WHERE ee.ENTITY_TYPE = 1
+-- ACCOUNTSPECIALMEMOS
+DELETE asm
+FROM ACCOUNTSPECIALMEMOS asm
+INNER JOIN #AccountActivityIds aai ON asm.ACCOUNTACTIVITYID = aai.ACCOUNTACTIVITYID
+PRINT convert(VARCHAR, getdate(), 120) + ' - deleted ACCOUNTSPECIALMEMOS: ' + convert(VARCHAR, @@rowcount)
 
-	PRINT convert(VARCHAR, getdate(), 120) + ' - deleted ENTITYEVENTS: ' + convert(VARCHAR, @@rowcount)
+-- ACCOUNTARRANGEMENTSCHEDULES
+DELETE aas
+FROM ACCOUNTARRANGEMENTSCHEDULES aas
+INNER JOIN #AccountActivityIds aai ON aas.ACCOUNTACTIVITYID = aai.ACCOUNTACTIVITYID
+PRINT convert(VARCHAR, getdate(), 120) + ' - deleted ACCOUNTARRANGEMENTSCHEDULES: ' + convert(VARCHAR, @@rowcount)
 
-	--------------------- ACCOUNTUPDATE -------------------------
-	DELETE au
-	FROM ACCOUNTUPDATES au
-		INNER JOIN #AccountActivityIds aai ON au.ACCOUNTACTIVITYID = aai.ACCOUNTACTIVITYID
+-- ARRANGEMENTDATES
+DELETE ad
+FROM ARRANGEMENTDATES ad
+INNER JOIN #AccountActivityIds aai ON ad.ACCOUNTACTIVITYID = aai.ACCOUNTACTIVITYID
+PRINT convert(VARCHAR, getdate(), 120) + ' - deleted ARRANGEMENTDATES: ' + convert(VARCHAR, @@rowcount)
 
-	PRINT convert(VARCHAR, getdate(), 120) + ' - deleted ACCOUNTUPDATES: ' + convert(VARCHAR, @@rowcount)
+-- CANCELLEDACCOUNTACTIVITIES
+DELETE caa
+FROM CANCELLEDACCOUNTACTIVITIES caa
+INNER JOIN #AccountActivityIds aai ON caa.ACCOUNTACTIVITYID = aai.ACCOUNTACTIVITYID
+PRINT convert(VARCHAR, getdate(), 120) + ' - deleted CANCELLEDACCOUNTACTIVITIES: ' + convert(VARCHAR, @@rowcount)
 
-	----------------- ACCOUNTCONTACTHISTORY ---------------------
-	DELETE ach
-	FROM ACCOUNTCONTACTHISTORY ach
-		INNER JOIN #AccountActivityIds aai ON ach.ACCOUNTACTIVITYID = aai.ACCOUNTACTIVITYID
+-- ACCOUNTACTIVITYKEYS
+DELETE aak
+FROM ACCOUNTACTIVITYKEYS aak
+INNER JOIN #AccountActivityIds aai ON aak.ACCOUNTACTIVITYID = aai.ACCOUNTACTIVITYID
+PRINT convert(VARCHAR, getdate(), 120) + ' - deleted ACCOUNTACTIVITYKEYS: ' + convert(VARCHAR, @@rowcount)
 
-	PRINT convert(VARCHAR, getdate(), 120) + ' - deleted ACCOUNTCONTACTHISTORY: ' + convert(VARCHAR, @@rowcount)
+-- ACCOUNTCLASSIFICATIONRESULTS
+DELETE acr
+FROM ACCOUNTCLASSIFICATIONRESULTS acr
+INNER JOIN #AccountActivityIds aai ON acr.ACCOUNTACTIVITYID = aai.ACCOUNTACTIVITYID
+PRINT convert(VARCHAR, getdate(), 120) + ' - deleted ACCOUNTCLASSIFICATIONRESULTS: ' + convert(VARCHAR, @@rowcount)
 
-	------------------ ACCOUNTACTIVITIES -------------------------
-	DELETE aa
-	FROM ACCOUNTACTIVITIES aa
-		INNER JOIN #AccountActivityIds aai ON aa.ID = aai.ACCOUNTACTIVITYID
+-- ACCOUNTPROPOSEWRITEOFF
+DELETE apw
+FROM ACCOUNTPROPOSEWRITEOFF apw
+INNER JOIN #AccountActivityIds aai ON apw.ACCOUNTACTIVITYID = aai.ACCOUNTACTIVITYID
+PRINT convert(VARCHAR, getdate(), 120) + ' - deleted ACCOUNTPROPOSEWRITEOFF: ' + convert(VARCHAR, @@rowcount)
 
-	PRINT convert(VARCHAR, getdate(), 120) + ' - deleted ACCOUNTACTIVITIES: ' + convert(VARCHAR, @@rowcount)
-	
-	DROP TABLE #AccountActivityIds
-END
+-- ACCOUNTSERVICEPRODUCTRESULTS
+DELETE aspr
+FROM ACCOUNTSERVICEPRODUCTRESULTS aspr
+INNER JOIN #AccountActivityIds aai ON aspr.ACCOUNTACTIVITYID = aai.ACCOUNTACTIVITYID
+PRINT convert(VARCHAR, getdate(), 120) + ' - deleted ACCOUNTSERVICEPRODUCTRESULTS: ' + convert(VARCHAR, @@rowcount)
+
+-- ACCOUNTSTATEMENTPRINTHISTORY
+DELETE asph
+FROM ACCOUNTSTATEMENTPRINTHISTORY asph
+INNER JOIN #AccountActivityIds aai ON asph.ACCOUNTACTIVITYID = aai.ACCOUNTACTIVITYID
+PRINT convert(VARCHAR, getdate(), 120) + ' - deleted ACCOUNTSTATEMENTPRINTHISTORY: ' + convert(VARCHAR, @@rowcount)
+
+-- BALANCEUPDATES
+DELETE bu
+FROM BALANCEUPDATES bu
+INNER JOIN #AccountActivityIds aai ON bu.ACCOUNTACTIVITYID = aai.ACCOUNTACTIVITYID
+PRINT convert(VARCHAR, getdate(), 120) + ' - deleted BALANCEUPDATES: ' + convert(VARCHAR, @@rowcount)
+
+-- DCAACCOUNTALLOCATION
+DELETE daa
+FROM DCAACCOUNTALLOCATION daa
+INNER JOIN #AccountActivityIds aai ON daa.ACCOUNTACTIVITYID = aai.ACCOUNTACTIVITYID
+PRINT convert(VARCHAR, getdate(), 120) + ' - deleted DCAACCOUNTALLOCATION: ' + convert(VARCHAR, @@rowcount)
+
+-- PRODUCTUPDATES
+DELETE pu
+FROM PRODUCTUPDATES pu
+INNER JOIN #AccountActivityIds aai ON pu.ACCOUNTACTIVITYID = aai.ACCOUNTACTIVITYID
+PRINT convert(VARCHAR, getdate(), 120) + ' - deleted PRODUCTUPDATES: ' + convert(VARCHAR, @@rowcount)
+
+-- SENTMESSAGES
+DELETE sm
+FROM SENTMESSAGES sm
+INNER JOIN #AccountActivityIds aai ON sm.ACCOUNTACTIVITYID = aai.ACCOUNTACTIVITYID
+PRINT convert(VARCHAR, getdate(), 120) + ' - deleted SENTMESSAGES: ' + convert(VARCHAR, @@rowcount)
+
+-- SERVICEUPDATES
+DELETE su
+FROM SERVICEUPDATES su
+INNER JOIN #AccountActivityIds aai ON su.ACCOUNTACTIVITYID = aai.ACCOUNTACTIVITYID
+PRINT convert(VARCHAR, getdate(), 120) + ' - deleted SERVICEUPDATES: ' + convert(VARCHAR, @@rowcount)
+
+-- TRANSACTIONUPDATES
+DELETE tu
+FROM TRANSACTIONUPDATES tu
+INNER JOIN #AccountActivityIds aai ON tu.ACCOUNTACTIVITYID = aai.ACCOUNTACTIVITYID
+PRINT convert(VARCHAR, getdate(), 120) + ' - deleted TRANSACTIONUPDATES: ' + convert(VARCHAR, @@rowcount)
+
+-- UNSENTMESSAGES
+DELETE um
+FROM UNSENTMESSAGES um
+INNER JOIN #AccountActivityIds aai ON um.ACCOUNTACTIVITYID = aai.ACCOUNTACTIVITYID
+PRINT convert(VARCHAR, getdate(), 120) + ' - deleted UNSENTMESSAGES: ' + convert(VARCHAR, @@rowcount)
