@@ -1,10 +1,1 @@
-SELECT 'CREATE TABLESPACE ' || dt.tablespace_name ||
-       ' DATAFILE ''' || df.file_name || ''' SIZE ' ||
-       TO_CHAR(df.bytes/1024/1024) || 'M ' ||
-       DECODE(df.autoextensible, 'YES', 'AUTOEXTEND ON NEXT ' ||
-       TO_CHAR(df.increment_by * df.block_size/1024/1024) || 'M MAXSIZE ' ||
-       DECODE(df.maxbytes, 0, 'UNLIMITED', TO_CHAR(df.maxbytes/1024/1024) || 'M'), 'AUTOEXTEND OFF') ||
-       ' ' || DECODE(dt.logging, 'LOGGING', 'LOGGING', 'NOLOGGING') || ';'
-FROM dba_tablespaces dt
-JOIN dba_data_files df ON dt.tablespace_name = df.tablespace_name
-WHERE dt.tablespace_name = 'DUPA';
+I need a license for MobaXterm because it is an advanced tool for remote server and system management that integrates multiple functions into one environment. It allows quick and seamless connections to various servers via SSH, SCP, SFTP, and other protocols, which significantly increases my efficiency in daily tasks. Additionally, MobaXterm supports multitasking sessions, enabling me to manage multiple projects simultaneously. It also provides tools for remote work on Linux/Unix systems from Windows, which is crucial for fulfilling my responsibilities. A license will grant me full access to all features and technical support, resulting in higher quality and efficiency in my work.
