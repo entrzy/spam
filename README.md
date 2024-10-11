@@ -1,14 +1,7 @@
-Get-ADGroupMember -Identity "GroupName" -Recursive | Where-Object { $_.objectClass -eq 'user' } | Get-ADUser | Select-Object Name, SamAccountName
+Zwracam się z uprzejmą prośbą o alokację pracy weekendowej dla pracownika SLA po stronie dostawcy (PS) w związku z planowaną migracją bazy danych systemu AML. Ze względu na zakres i specyfikę tych prac, konieczne będzie wsparcie techniczne w czasie poza standardowymi godzinami SLA, które obecnie obejmuje jedynie dni robocze w godzinach 8:00-17:00.
 
+Alokacja ta jest szczególnie istotna, ponieważ w przypadku wystąpienia problemów z aplikacją, dla której migrowana jest baza danych, chcemy mieć możliwość szybkiej reakcji i minimalizacji czasu przestoju. Dlatego potrzebujemy zapewnienia pełnej gotowości pracownika SLA po stronie dostawcy.
 
+Pragnę zaznaczyć, że realizacja wsparcia w weekend będzie wiązała się z dodatkowymi kosztami, wynikającymi z pracy poza standardowym czasem SLA. Będziemy wdzięczni za akceptację tej prośby, aby zapewnić sprawny przebieg migracji i zminimalizować potencjalne ryzyka.
 
-
-Based on the analysis of the logs, I found entries related to communication on port 58989 and replication operations. Here are the key points:
-
-Replication on port 58989: The logs indicate active replication communication between the servers using this port. The entries describe the process of receiving and processing messages between the servers, suggesting that replication is functioning.
-
-No errors found: I did not find any entries indicating errors or warnings related to the replication process. The logs mention the successful processing of messages like "ChangeTimeHeartbeatMsg," which indicates that synchronization is proceeding correctly.
-
-Replication entries: Both logs contain similar entries related to different domains (e.g., "cn=schema" and "cn=admin data"), indicating that replication is occurring across various parts of the system.
-
-Based on this information, it appears that replication between the OpenDJ instances is working as expected. If you need further analysis on specific issues, I can search the logs for more details or specific events.
+Proszę o potwierdzenie możliwości alokacji zasobów oraz o dalsze wskazówki dotyczące formalizacji tego procesu.
