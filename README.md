@@ -1,2 +1,1 @@
 
-Szerokie uprawnienia sieciowe są uzasadnione koniecznością zapewnienia płynnego dostępu do zasobów banku w celu monitorowania, wsparcia oraz zapewnienia ciągłości działania systemów dostarczanych przez dostawcę. Z punktu widzenia biznesowego taki poziom integracji pozwala na szybsze wykrywanie i rozwiązywanie problemów, co bezpośrednio wpływa na jakość obsługi klientów i minimalizuje ryzyko operacyjne dla obu stron.
