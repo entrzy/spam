@@ -1,4 +1,4 @@
-  <system.diagnostics>
+ent  <system.diagnostics>
     <trace autoflush="true" indentsize="4">
       <listeners>
         <remove name="Default"/>
