@@ -13,6 +13,5 @@ com.ibm.ws.websvcs.transport.http.HttpInputStreamCollector=all
 
 com.ibm.ws.sib.processor.impl.DestinationManager=all
 com.ibm.ws.jms.*=info
-# (opcjonalnie na krótko – body SIBus):
 com.ibm.ws.sib.msgstore.MessageStore=all
 com.ibm.ws.sib.trm.*=all
