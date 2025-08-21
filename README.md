@@ -1,1 +1,1 @@
-Get-Content "trace.log" -Wait | Where-Object {($_ -notlike "*multipart/related*") -and ($_ -notlike "*Message contents*0000*'*") -and ($_ -notlike "*Content-Transfer-Encoding: binary*")} | Out-File "ws_trace.log" -Append -Encoding utf8
+Get-Content "trace.log" -Wait | Where-Object { ($_ -notmatch "(?i)multipart/related|Content-Transfer-Encod\w*\s*:\s*binary|--?MIMEBoundary") -and ($_ -notmatch "^\s*[0-9A-F]{4}\s") -and ($_ -notmatch "[^\x09\x0A\x0D\x20-\x7E]{8,}") } | Out-File "ws_trace.log" -Append -Encoding utf8
