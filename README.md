@@ -1,1 +1,1 @@
-{$_ -notmatch "[^\u0009\u000A\u000D\u0020-\u007E\u0080-\uFFFF]"}
+$App="C:\inetpub\wwwroot\TwojaAplikacja"; @($App,"$env:windir\System32\inetsrv\config") | ForEach-Object { Get-ChildItem $_ -Recurse -File -ErrorAction SilentlyContinue } | Sort-Object LastWriteTime -Descending | Select-Object -First 100 @{N="DATA ZMIANY";E={$_.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")}}, @{N="ROZMIAR KB";E={[math]::Round($_.Length/1KB,1)}}, FullName | Format-Table -AutoSize
