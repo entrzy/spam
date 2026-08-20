@@ -1,1 +1,10 @@
-$App="C:\inetpub\wwwroot\TwojaAplikacja"; @($App,"$env:windir\System32\inetsrv\config") | ForEach-Object { Get-ChildItem $_ -Recurse -File -ErrorAction SilentlyContinue } | Sort-Object LastWriteTime -Descending | Select-Object -First 100 @{N="DATA ZMIANY";E={$_.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")}}, @{N="ROZMIAR KB";E={[math]::Round($_.Length/1KB,1)}}, FullName | Format-Table -AutoSize
+Get-Service | Where-Object {
+    $_.Name -match "LSEG|Refinitiv|Reuters|Workspace" -or
+    $_.DisplayName -match "LSEG|Refinitiv|Reuters|Workspace"
+} | Format-Table Status,Name,DisplayName -Auto
+
+
+
+Get-Process | Where-Object {
+    $_.ProcessName -match "LSEG|Refinitiv|Workspace|Eikon"
+} | Select-Object ProcessName,Id,Path
